@@ -7,4 +7,6 @@ Changes:
   <li>Arrows move faster</li>
   <li>Players respawn in a set position</li>
   <li>Right clicking a dispenser causes it to shoot</li>
+  <li>Interactions with several decorational objects are disabled</li>
+  <li>Players recieve a custom message upon entering the server</li>
 </ol>
