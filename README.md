@@ -9,3 +9,5 @@ Changes:
 - Right clicking a dispenser causes it to shoot
 - Interactions with several decorational objects are disabled
 - Players recieve a custom message upon entering the server
+- Items don't drop on death
+- Carved pumpkin functions like a gasmask
