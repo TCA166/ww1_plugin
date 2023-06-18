@@ -1,12 +1,11 @@
 # ww1_plugin
 A 16.4 Minecraft server plugin designed for a TDM WW1 themed server.
 Changes:
-<ol>
-  <li>Arrows instantly kill</li>
-  <li>Arrows dissapear after hitting the ground</li>
-  <li>Arrows move faster</li>
-  <li>Players respawn in a set position</li>
-  <li>Right clicking a dispenser causes it to shoot</li>
-  <li>Interactions with several decorational objects are disabled</li>
-  <li>Players recieve a custom message upon entering the server</li>
-</ol>
+
+- Arrows deal a lot of damage
+- Arrows dissapear after hitting the ground
+- Arrows move faster
+- Players respawn in a set position
+- Right clicking a dispenser causes it to shoot
+- Interactions with several decorational objects are disabled
+- Players recieve a custom message upon entering the server
