@@ -1,25 +1,36 @@
 package ww1.plugin.pack;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Dispenser;
 import org.bukkit.entity.Damageable;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
 
@@ -31,7 +42,23 @@ public class myListener implements Listener{
     public void somethingHit​(EntityDamageByEntityEvent e) {
     	//Bukkit.broadcastMessage(e.getCause().toString());
     	if(e.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
-    		((Damageable)e.getEntity()).setHealth(0);
+    		Vector target = e.getEntity().getLocation().getDirection();
+    		Vector arrow = e.getDamager().getVelocity();
+    		target = target.normalize();
+    		arrow = arrow.normalize();
+    		boolean facing = target.getX() * arrow.getX() + target.getZ() * arrow.getZ() < 0.45;
+    		//Damageable target = (Damageable)e.getEntity();
+    		boolean cancel = false;
+    		if(e.getEntityType() == EntityType.PLAYER) {
+    			Player p = (Player)e.getEntity();
+    			if(p.isBlocking() && facing) {
+    				cancel = true;
+    			}
+    		}
+    		if(!cancel) {
+    			e.setDamage(22);
+    		}
+    		//((Damageable)e.getEntity()).setHealth(0);
     	}
     }
     //occurs when a projectile hits
@@ -42,14 +69,34 @@ public class myListener implements Listener{
     		e.getEntity().remove();
     	}
     }
+    
+    
+    @EventHandler
+    public void onPlayerDeathDrop(PlayerDeathEvent e) {
+    	e.getDrops().clear();
+          
+    }
+    
+    @EventHandler
+    public void onPlayerDropItem(PlayerDropItemEvent event){
+    	String typeNameString = event.getItemDrop().getItemStack().getType().name();
+    	if (typeNameString.endsWith("_HELMET")
+                || typeNameString.endsWith("_CHESTPLATE")
+                || typeNameString.endsWith("_LEGGINGS")
+                || typeNameString.endsWith("_BOOTS")) {
+    		event.getItemDrop().remove();
+    		//event.setCancelled(true);
+        }
+    }
+    
     //occurs when someone shoots an arrow
     @EventHandler
     public void shootArrow(EntityShootBowEvent e) {
     	if(e.getBow().getType() == Material.BOW) {
         	Vector projectileVector = e.getProjectile().getVelocity();
-        	projectileVector.setX(projectileVector.getX() * 2);
-        	projectileVector.setY(projectileVector.getY() * 2);
-        	projectileVector.setZ(projectileVector.getZ() * 2);
+        	projectileVector.setX(projectileVector.getX() * 5);
+        	projectileVector.setY(projectileVector.getY() * 5);
+        	projectileVector.setZ(projectileVector.getZ() * 5);
         	e.getProjectile().setVelocity(projectileVector);
     	}
     	else {
@@ -92,8 +139,8 @@ public class myListener implements Listener{
     @EventHandler
     public void buttonInteract(PlayerInteractEvent e) {
     	Block clickedBlock = e.getClickedBlock();
-    	//if player clicked the trapdoor with rightclick
-    	if (clickedBlock.getType().toString().contains("TRAPDOOR") && e.getAction().toString() == "RIGHT_CLICK_BLOCK") {
+    	//if player clicked the trapdoor with rightclick 
+    	if (clickedBlock.getType().toString().contains("TRAPDOOR") && e.getAction().toString() == "RIGHT_CLICK_BLOCK" && e.getPlayer().getGameMode() != GameMode.CREATIVE) {
     		e.setCancelled(true);
     	}
     	//else if player clicked dispenser with rightclick
@@ -115,20 +162,25 @@ public class myListener implements Listener{
     @EventHandler
     public void shootDispenser(BlockDispenseEvent e) {
     	if(e.getItem().getType() == Material.ARROW) {
-        	//Bukkit.broadcastMessage(e.getHitBlock().toString());
         	Vector projectileVector = e.getVelocity();
-        	projectileVector.setX(projectileVector.getX() * 10);
-        	if(projectileVector.getY() > 0) {
-        		projectileVector.setY(projectileVector.getY() * 10);
-        	}
-        	else {
-        		projectileVector.setY(projectileVector.getY() / 10);
-        	}
-        	
-        	projectileVector.setZ(projectileVector.getZ() * 10);
+        	//Bukkit.broadcastMessage(Double.toString(projectileVector.getY()));
+        	projectileVector.setX(projectileVector.getX() * 30);
+        	projectileVector.setY(3);
+        	projectileVector.setZ(projectileVector.getZ() * 30);
         	e.setVelocity(projectileVector);
     	}
 
+    }
+    
+    @EventHandler
+    public void ignoreGas(EntityPotionEffectEvent e) {
+    	if(e.getEntityType() == EntityType.PLAYER) {
+    		Player p = (Player)e.getEntity();
+    		if(p.getInventory().getHelmet().getType() == Material.CARVED_PUMPKIN) {
+    			e.setCancelled(true);
+    		}
+    	}
+    	
     }
     
 }
